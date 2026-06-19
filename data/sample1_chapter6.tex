@@ -1,0 +1,81 @@
+\chapter{核心理论分析}
+
+为证明定理 \ref{thm:main}，本文构建了李雅普诺夫分析框架。理论论证解耦为两个阶段：第一阶段证明在非一致性信息传输下诚实节点状态的渐近一致性；第二阶段证明该一致性状态序列收敛至 $\mathcal{X}(\tilde{\beta}, \tilde{\gamma})$-可容许的合法目标集合中。
+
+\section{状态一致性的渐近可达性}
+
+在带投影的分布式梯度下降算法中，诚实节点 $i$ 的更新规则为 $x_i[t] = P_{\mathcal{X}} [\tilde{x}_i[t] - \lambda[t]\tilde{g}_i[t]]$。为将投影算子引入线性动力学系统进行分析，本文定义投影误差 $e_i[t]$ 如下：
+\begin{equation} \label{eq:proj_err}
+    e_i[t] \triangleq P_{\mathcal{X}} [\tilde{x}_i[t] - \lambda[t]\tilde{g}_i[t]] - (\tilde{x}_i[t] - \lambda[t]\tilde{g}_i[t]).
+\end{equation}
+
+基于可容许函数具有 $L-Lipschitz$ 连续且梯度有界的假设（即对任意 $x \in \mathcal{X}$，$|\nabla f(x)| \le L$）。由于算法在第 $t$ 次迭代实际使用的伪梯度 $\tilde{g}_i[t]$ 是由邻居传来的真实梯度经过 $\operatorname{Trim}(\cdot)$ 修剪后得到的极值均值，因此 $\tilde{g}_i[t]$ 的界限必然受限于诚实节点的真实梯度界限，即 $|\tilde{g}_i[t]| \le L$ 依然成立。结合投影算子的非扩张性，可得如下命题 \ref{prop:1}。
+
+\begin{proposition}\label{prop:1}
+    对于所有诚实节点 $i$，投影误差受步长与梯度上界的严格约束，即 $|e_i[t]| \le \lambda[t]L$。
+\end{proposition}
+
+剥离投影算子后，全体诚实节点（共 $n-\phi$ 个）的状态演化可写为受扰动的矩阵系统：
+\begin{equation}
+    \label{eq:state_update}
+    x[t] = M[t]x[t-1] - \lambda[t]\tilde{g}[t] + e[t].
+\end{equation}
+\eqref{eq:state_update}式中，$x[t], \tilde{g}[t], e[t] \in \mathbb{R}^{n-\phi}$ 分别为诚实节点的状态向量、伪梯度向量与投影误差向量。由于算法引入了极值修剪算子 $\operatorname{Trim}(\cdot)$，并利用其在信息聚合阶段严格剔除了最大和最小的各 $b$ 个状态值。因此，剩余参与求均值的 $d_i - 2b + 1$ 个元素，其上下界必然被诚实节点真实状态的极值所限定。这一特性使得聚合后的状态在代数上等价于全体诚实节点历史状态的凸组合：
+\begin{equation} \label{eq:convex_comb}
+    \tilde{x}_i[t] = \sum_{j=1}^{n-\phi} M_{ij}[t]x_j[t-1].
+\end{equation}
+这也保证了时变转移矩阵 $M[t]$ 始终为一个行随机矩阵。
+
+为了量化转移矩阵 $M[t]$ 的连通性，基于早期文献 \upcite{vaidya2012iterative} 的结论，当网络图 $G(\mathcal{V}, \mathcal{E})$ 的每一个约化图都存在非空源组件时，矩阵 $M[t]$ 满足：存在某个约化图的邻接矩阵 $H[t]$，使得 $M[t] \ge \xi H[t]$ 成立，其中 $\xi \triangleq \frac{1}{2(d_{\max} + 1 - 2b)}$，且 $d_{\max} \triangleq \max_{i \in \mathcal{V}}d_i$ 代表网络中的最大入度。
+
+将式 \eqref{eq:state_update} 向前递推，定义反向状态转移矩阵 $\Phi(t, r) \triangleq M[t]M[t-1] \cdots M[r]$，状态向量展开为：
+\begin{equation} \label{eq:expansion}
+    x[t] = \Phi(t, 1)x[0] - \sum_{r=1}^t \lambda[r]\Phi(t, r+1)\tilde{g}[r] + \sum_{r=1}^t \Phi(t, r+1)e[r].
+\end{equation}
+基于转移矩阵的拓扑连通性，本文引入文献中的命题~2 \upcite{tseng2015fault}，即矩阵 $\Phi$ 的各行随时间推移呈现指数级收敛特征。对任意诚实节点 $i, j$ 及指标 $\ell$ 满足：
+\begin{equation}
+    |\Phi_{i\ell}(t, r) - \Phi_{j\ell}(t, r)| \le \theta^{\lfloor \frac{t-r+1}{\nu} \rfloor},
+\end{equation}
+其中 $\nu \triangleq \tau(n-\phi)$，常数 $\tau$ 为可能存在的约化图总数，衰减因子定义为 $\theta \triangleq 1 - \xi^\nu \in (0, 1)$。
+
+将上述界限代入状态展开式 \eqref{eq:expansion}，并结合投影误差界限 $|e_i[t]| \le \lambda[t]L$，可得下述引理 \ref{lem:2}。
+
+\begin{lemma}\label{lem:2}
+    对任意两个诚实节点 $i, j$，有
+    \begin{equation}
+        |x_i[t] - x_j[t]| \le (n - \phi)\theta^{\lfloor \frac{t}{\nu} \rfloor} \max_{\ell \in \mathcal{V}\setminus\mathcal{A}}|x_\ell[0]| + 2L(n - \phi)\sum_{r=1}^t \lambda[r]\theta^{\lfloor \frac{t-r}{\nu} \rfloor}.
+    \end{equation}
+\end{lemma}
+
+该不等式右侧第二项是指数衰减序列 $\theta^{(\cdot)}$ 与步长序列 $\lambda[r]$ 的离散卷积。依据算法设定的步长收敛条件（即$\sum \lambda[t] = \infty$ 且 $\lim_{t \to \infty}\lambda[t] = 0$），利用随机近似引理可知，该卷积项在当 $t \to \infty$ 时趋于 $0$。由此可得以下推论 \ref{cor:1}。
+
+\begin{corollary}\label{cor:1}
+    $\lim_{t \to \infty} |x_i[t] - x_j[t]| = 0$，即所有诚实节点的状态值达到渐近一致。
+\end{corollary}
+
+\section{向合法最优解集的收敛性}
+在证明诚实节点达成状态一致性后，需进一步证明该共识状态序列落入由 $(\tilde{\beta}, \tilde{\gamma})$-可容许性所界定的合法目标解集 $\mathcal{X}(\tilde{\beta}, \tilde{\gamma})$ 内。
+
+为实现这一目标，本文所提算法在梯度更新时放弃了求均值操作，而是采用了对修剪后集合取最大值与最小值中点的非对称策略。基于对凸组合边界的代数重构 \upcite{su2016fault}，这一特定的更新方式在数学上促成了如下关键引理\ref{lem:3}。
+
+\begin{lemma}\label{lem:3}
+    对于任意迭代 $t$ 和诚实节点 $i$，存在一组严格满足 $(\tilde{\beta}, \tilde{\gamma})$-可容许性约束的系数 $\{\alpha_j^{it}\}_{j \in \mathcal{V} \setminus \mathcal{A}}$，使得其计算所得的伪梯度满足：
+    \begin{equation} \label{eq:pseudo_grad}
+        \tilde{g}_i[t] = \sum_{j \in \mathcal{V} \setminus \mathcal{A}} \alpha_j^{it} \nabla f_j(x_j[t-1]).
+    \end{equation}
+\end{lemma}
+
+式 \eqref{eq:pseudo_grad} 表明，伪梯度本质上等价于某个时变下的合法目标函数 $p_i^t \in \mathcal{C}(\tilde{\beta}, \tilde{\gamma})$ 在前一时刻状态下的真实梯度。
+
+基于该等价性，为了克服诚实节点在瞬态时各自跟踪不同合法函数 $p_i^t$ 所带来的分析困难，本文构造了一个包围所有诚实节点的辅助估计序列 $\{z[t]\}_{t=1}^\infty$。定义 $z[t] = x_{j_t}[t]$，其中指标 $j_t$ 指代在当前迭代 $t$ 下，距离最优解集 $\mathcal{X}(\tilde{\beta}, \tilde{\gamma})$ 欧氏距离最远的诚实节点：
+\begin{equation}
+    j_t \in \arg \max_{j \in \mathcal{V} \setminus \mathcal{A}} \operatorname{Dist}\Big(x_j[t], \mathcal{X}(\tilde{\beta}, \tilde{\gamma})\Big).
+\end{equation}
+
+引入辅助序列后，结合点到闭凸集距离的非负性及投影算子的非扩张性，推导出辅助序列的收敛性递推不等式：
+\begin{align}
+    & \operatorname{Dist} \left( z[t], X(\tilde{\beta}, \tilde{\gamma}) \right)  \notag \\
+    & \qquad \leq \inf_{y \in X(\tilde{\beta}, \tilde{\gamma})} \left| x_{j'_t} [t - 1] - \lambda[t] (p^{j_t t})' (x_{j'_t} [t - 1]) - y \right|\notag \\
+    & \qquad + \; \lambda[t] L \max_{i,j \in V \setminus A} \left| x_i [t - 1] - x_j [t - 1] \right|. \label{eq:dist_bound}
+\end{align}
+式 \eqref{eq:dist_bound} 清晰地解耦了系统的演化动态，右侧第一项代表在强凸或凸的合法函数 $p^{j_t t}$ 引导下，标准次梯度下降引起的向目标解集的距离收缩；第二项代表诚实多智能体间由于状态尚未完全一致而产生的残余误差拉扯项。依据上一小节的推论 \ref{cor:1}，随着 $t \to \infty$，最大状态偏差 $\max |x_i - x_j| \to 0$。因此，残差项逐渐衰减消失，这就保证了处于最远边界的辅助序列必然渐近收敛于目标集合中，即 $\lim_{t \to \infty} \operatorname{Dist}(z[t], \mathcal{X}(\tilde{\beta}, \tilde{\gamma})) = 0$。定理 \ref{thm:main} 由此得证。

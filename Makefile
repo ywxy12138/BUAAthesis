@@ -1,8 +1,10 @@
+XELATEX = xelatex --shell-escape
+
 bachelor:
-	xelatex sample-bachelor.tex
+	$(XELATEX) sample-bachelor.tex
 	-bibtex  sample-bachelor.aux
-	xelatex sample-bachelor.tex
-	xelatex sample-bachelor.tex
+	$(XELATEX) sample-bachelor.tex
+	$(XELATEX) sample-bachelor.tex
 master:
 	xelatex sample-master.tex
 	-bibtex  sample-master.aux

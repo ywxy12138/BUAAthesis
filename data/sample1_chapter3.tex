@@ -1,0 +1,27 @@
+\chapter{系统概述}
+
+在无对抗网络中，多智能体分布式优化的经典范式是所有节点通过交换局部状态与梯度信息，协同最小化所有局部代价函数的算术平均值\upcite{nedic2009distributed} 
+\begin{equation}
+\frac{1}{n}\sum_{i=1}^{n} f_i(x) 
+\label{average value}
+\end{equation}其中，$x \in \mathbb{R}^d$ 为全局决策变量，$f_i(x): \mathbb{R}^d \to \mathbb{R}$ 代表节点 $i$ 的局部代价函数，而$n$ 为网络中总的节点个数。这一基于算术平均的聚合机制赋予了所有节点完全平等的权重（即每个节点的权重均为$\frac{1}{n}$），构成了分布式优化中广泛采用的基线方法。
+
+然而，在面临拜占庭故障时，该基线方法显现出明显的局限性。由于算术平均算子对极端异常值缺乏鲁棒性，网络中即使仅存在少数的拜占庭节点，也可通过在通信中注入趋于无穷大的伪造状态或异常梯度值，导致聚合后的全局最优解发生任意偏移，进而使得整个优化系统无法收敛。
+
+为了克服上述缺陷，本文在理论框架上对优化目标进行了重构，系统在宏观上转换为约束诚实智能体协同最小化一个仅由诚实节点局部代价函数构成的凸组合，即
+\begin{equation}
+\min \sum_{i \in \mathcal{V} \setminus \mathcal{A}} \alpha_i f_i(x)
+\label{new_target}
+\end{equation}
+在公式\ref{new_target}中，$\mathcal{V} = \{1, 2, \dots, n\}$ 表示网络中所有节点的集合，$\mathcal{A}$ 代表遭受拜占庭故障的对抗节点集合，则$\mathcal{V} \setminus \mathcal{A}$ 即为诚实节点的集合；$\alpha_i \ge 0$ 且满足 $\sum_{i \in \mathcal{V} \setminus \mathcal{A}} \alpha_i = 1$，代表诚实节点 $i$ 在最终全局决策中所占的实际权重。
+
+为避免上述凸组合塌缩为由极个别诚实节点主导的平凡解，本文进一步引入了 ($\beta, \gamma$)-可容许性约束。该约束在数学上要求诚实节点集合中，必须至少有 $\gamma$ 个节点的权重 $\alpha_i$ 大于或等于预设的下界 $\beta$。这一机制确保了足够数量的诚实节点在全局决策中保持有效的影响力。
+
+为求解该重构目标，本文提出了一种基于双重修剪的分布式梯度下降算法。如图 \ref{fig:example} 所示，该算法通过在局部状态估计和局部梯度计算两个维度上同时执行极值截断操作，将含有对抗注入的非线性状态演化等效地约束在诚实节点的凸包内部。理论分析表明，在确保通信图满足约简图连通假设的前提下，该方法能够在牺牲一定寻优精度的条件下，保障系统在对抗环境中向合法目标解集渐近收敛。
+
+\begin{figure}[h]
+    \centering
+    \includesvg[width=0.8\textwidth]{function.svg}
+    \caption{基于双重修剪的分布式梯度下降算法图}
+    \label{fig:example}
+\end{figure}

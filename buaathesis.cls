@@ -183,7 +183,7 @@ The LaTeX template for thesis of BUAA]
         \else
             \fancyhead[C]{
                 \includegraphics[width=37bp]{figure/buaamark.pdf}\hfill
-                \raisebox{2ex}{\heiti\zihao{4}\buaa@university 毕业设计(论文)}\hfill
+                % \raisebox{2ex}{\heiti\zihao{4}\buaa@university }\hfill
                 \raisebox{2ex}{\songti\zihao{5}第\quad\thepage\quad 页}
             }
         \fi
@@ -1241,9 +1241,7 @@ The LaTeX template for thesis of BUAA]
         \else
             \pagestyle{empty}
             \loadgeometry{bachelortaskgeometry}
-            \buaa@bachelor@assign     %本科生论文任务书
             \loadgeometry{bachelorgeometry}
-            \announce                 %本科生声明
             \pagestyle{fancy}
             \frontmatter
         \fi
@@ -1409,13 +1407,13 @@ The LaTeX template for thesis of BUAA]
     \def\buaa@unicode{#1}
 }
 % 学号
-\def\buaa@studentID{}
+\def\buaa@studentID{23371355}
 \newcommand{\studentID}[1]{%
     \def\buaa@studentID{#1}
 }
 % 论文时间
-\def\buaa@thesisdateyear{}
-\def\buaa@thesisdatemonth{}
+\def\buaa@thesisdateyear{2026}
+\def\buaa@thesisdatemonth{6}
 \newcommand{\thesisdate}[2]{%
     \def\buaa@thesisdateyear{#1}
     \def\buaa@thesisdatemonth{#2}

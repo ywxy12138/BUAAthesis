@@ -1,0 +1,4 @@
+# 使用buaa论文模板犯错小结
+1. 先将overleaf上的原论文latex版本导入，让ai按照buaa模板的格式进行修正，结果出现了闭合的`\cite{}`被认成未闭合的情况，经过核查，发现是`\usepackage(cite)`与模板自带的引用包发生了冲突，将前者剔除后就可以正常运行了。
+2. 用以前vs配置的latex编译生成pdf的方式与模板给定的latex编译方式不一致，模板一定需要通过`make`命令来执行，也就是通过`Makefile`中的四行命令来执行，使用前者会出现目录、引用和参考文献不能正常显示的情况，原因是在 LaTeX 中使用 BibTeX 管理参考文献时，必须按照特定的编译顺序才能正确生成文献列表。常见的标准流程是 `LaTeX → BibTeX → LaTeX → LaTeX`，下面是详细步骤：首次编译生成`.aux`文件，其中包含文献引用的相关信息，`pdflatex filename.tex`，这个文件供BibTeX使用；再运行`BibTeX`，根据`.aux`文件生成`.bbl`文件，`bibtex filename`，注意此处`filename`不带后缀；再次编译`LaTeX`，将`.bbl`文件中参考文献引入主文档中，`pdflatex filename.tex`；最终编译`LaTex`，解决交叉引用和引用编号的正确显示，执行`pdflatex filename.tex`，最终PDF可以正常显示了。
+3. 最后由于在`inkscape`中该图为`svg`格式，需要添加`\usepackage(svg)`引用`svg`包，并且对于图的引用需要改用`includesvg(...)`命令，同时需要将`inkscape`的`bin`目录添加到系统`PATH`中，让使用`make`命令进行编译的时候知道去哪找`inkscape`以便进行svg图的生成

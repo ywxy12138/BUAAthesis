@@ -1,0 +1,38 @@
+% 附录：从 sample-1.tex 中提取的附录内容
+\chapter{预备知识与相关定义}
+
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+  
+\renewcommand{\thetable}{A\arabic{table}}
+\setcounter{equation}{0}
+\renewcommand{\theequation}{A\arabic{equation}}
+
+本节补充正文中涉及的数学基础概念与拓扑定义。
+
+\section{投影算子与距离度量}
+
+令 $\operatorname{Dist}(x,\mathcal{X})$ 表示点 $x$ 到集合 $\mathcal{X}$ 的最短欧氏距离，定义为：
+\begin{equation}
+    \operatorname{Dist}(x,\mathcal{X}) = \inf_{y\in\mathcal{X}}|x-y|.
+    \label{eq:dist_app}
+\end{equation}
+
+用 $P_{\mathcal{X}}[x]$ 表示点 $x$ 在闭凸集 $\mathcal{X}$ 上的投影，即 $P_{\mathcal{X}}[x] = \arg\min_{z\in\mathcal{X}}|z-x|$。在算法收敛性证明中，投影算子的非扩张性发挥重要作用，即对于任意 $x,y\in\mathbb{R}$，满足 $|P_{\mathcal{X}}[x] - P_{\mathcal{X}}[y]| \le |x-y|$。
+
+\section{有效全局目标解集}
+
+给定可容许性参数 $(\beta,\gamma)$，定义满足该结构约束的所有全局目标函数构成的函数族为 $\mathcal{C}(\beta,\gamma)$。对于该函数族中的任意函数 $p(x)$，其极小值点构成的并集即为有效全局目标解集 $X(\beta,\gamma)$：
+\begin{equation}
+    X(\beta,\gamma)\triangleq \bigcup_{p\in\mathcal{C}(\beta,\gamma)} \arg\min_{x\in\mathcal{X}} p(x).
+    \label{eq:Xdef_app}
+\end{equation}
+
+\section{约化图与拜占庭共识拓扑条件}
+
+多智能体网络在对抗环境下的信息交互能力依赖于其拓扑结构的冗余度。对于网络 $G(\mathcal{V},\mathcal{E})$，其约化图$\mathcal{H}$ 是通过以下规则生成的子图 \upcite{vaidya2012iterative}：(1) 移除所有拜占庭智能体及其关联边；(2) 额外删除每个诚实智能体至多 $b$ 条入边。
+
+图的源组件定义为图中一个特定的节点集合，该集合内的任一节点均存在有向路径通往网络中的所有其他节点。
+
+为确保系统具备抵御拜占庭故障的基本共识能力，本文算法要求底层网络满足严格的拓扑条件，即网络 $G(\mathcal{V},\mathcal{E})$ 的每一个约化图都必须包含非空的源组件。该假设从物理层面上保障了在经历极端截断与恶意节点隔离后，诚实节点之间仍能维持有效的信息连通。
