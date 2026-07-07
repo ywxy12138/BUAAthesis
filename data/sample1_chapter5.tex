@@ -1,7 +1,7 @@
 \chapter{核心研究方法}
 
 \section{基于双重修剪的分布式梯度下降算法}
-为求解重构后的优化目标，本文提出了一种基于双重修剪机制的协同分布式梯度下降算法 \upcite{su2021byzantine}。算法具体执行流程如算法 \ref{alg:1} 所示（针对诚实智能体 $i\in\mathcal{V}\setminus\mathcal{A}$）。
+为求解重构后的优化目标，本文提出了一种基于双重修剪机制的协同分布式梯度下降算法。算法具体执行流程如算法 \ref{alg:1} 所示（针对诚实智能体 $i\in\mathcal{V}\setminus\mathcal{A}$）。
 
 \begin{algorithm}[H]
     \KwIn{$b$ 以及序列 ${\lambda[t]}_{t=1}^{\infty}$}
@@ -27,9 +27,12 @@
 
 诚实智能体 $i$ 在第 $t$ 次迭代时，将局部估计 $x_i[t-1]$ 和局部梯度 $f_i'(x_i[t-1])$ 传递给其出度邻居。随后，节点 $i$ 构建两个本地数据集合：$\mathcal{D}_i^x[t]$ 为从入度邻居收到的状态估计值集合，$\mathcal{D}_i^g[t]$ 为收到的梯度集合与自身局部梯度的并集。由于拜占庭节点可实施非一致性信息传输 \upcite{fischer1985impossibility}，不同诚实节点接收到的数据集合可能各不相同。若某入度邻居通信缺失，则以默认值处理，并自动将其视为拜占庭节点。
 
-算法的核心在于引入了非线性截断函数 $Trim(\cdot)$。该函数接受规模不小于 $2b+1$ 的多重集合，对其进行非降序排列后，直接移除最小的 $b$ 个和最大的 $b$ 个元素。这一操作可在无需辨别节点身份的前提下，有效截断异常的极值。
+算法的核心在于引入了非线性截断函数 $Trim(\cdot)$。该函数接受规模不小于 $2b+1$ 的多重集合，对其进行非降序排列后，直接移除最小的和最大的各 $b$ 个元素。这一操作可在无需辨别节点身份的前提下，有效截断异常的极值。
 
-在信息聚合阶段，状态与梯度的处理策略有所区别。鲁棒状态估计 $\widetilde{x}_i[t]$ 取 $Trim(\mathcal{D}_i^x[t]) \cup \{x_i[t-1]\}$ 中所有元素的算术平均值；而鲁棒伪梯度 $\widetilde{g}_i[t]$ 取 $Trim(\mathcal{D}_i^g[t])$ 中最大值与最小值的平均数。随后，通过投影算子 $P_{\mathcal{X}}$ 将更新后的状态拉回至可行域 $\mathcal{X}$ 内避免状态偏离可行域，进而完成单次迭代：
+在信息聚合阶段，状态与梯度的处理策略有所区别。
+
+鲁棒状态估计 $\widetilde{x}_i[t]$ 取 $Trim(\mathcal{D}_i^x[t]) \cup \{x_i[t-1]\}$ 中所有元素的算术平均值；而鲁棒伪梯度 $\widetilde{g}_i[t]$ 取 $Trim(\mathcal{D}_i^g[t])$ 中最大值与最小值的平均数。随后，通过投影算子 $P_{\mathcal{X}}$ 将更新后的状态拉回至可行域 $\mathcal{X}$ 内避免状态偏离可行域，进而完成单次迭代：
+
 \begin{equation}
     x_i[t] \leftarrow P_{\mathcal{X}}\bigl[\widetilde{x}_i[t] - \lambda[t]\widetilde{g}_i[t]\bigr].
     \label{eq:update}

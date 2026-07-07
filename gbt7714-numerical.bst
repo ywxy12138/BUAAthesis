@@ -45,7 +45,7 @@ INTEGERS {
 
 FUNCTION {load.config}
 {
-  #1 'uppercase.name :=
+  #0 'uppercase.name :=
   #3 'max.num.authors :=
   #1 'sentence.case.title :=
   #0 'link.title :=
@@ -58,7 +58,7 @@ FUNCTION {load.config}
   #0 'italic.journal :=
   #0 'bold.journal.volume :=
   #1 'show.missing.address.publisher :=
-  #0 'space.before.pages :=
+  #0 'space.before.pages := % 设定该值为0
   #0 'only.start.page :=
   #1 'show.url :=
   #1 'show.doi :=
@@ -1180,14 +1180,15 @@ FUNCTION {format.journal.number}
 }
 
 FUNCTION {format.journal.pages}
-{ pages empty$
+{ pages empty$ % pages为空则返回空字串
     { "" }
     { space.before.pages
-        { ": " }
-        { ":\penalty0 " }
+        { ": " } % 条件为真输出: + 空格
+        { ": \penalty0 " } % 否则，输出 : + 空格 + 换行惩罚 + 空格 ，始终执行该分支
+        % 此处具体作用是当页码很长（例如 2227--2233）且正好位于行末时，如果不在冒号后添加换行点，TeX 可能会把整段文字拉到下一行，或者导致行尾溢出。加上 \penalty0 后，TeX 可以在冒号和页码之间断行，让排版更美观。
       if$
       format.pages *
-    }
+    } % 否则执行内部逻辑
   if$
 }
 

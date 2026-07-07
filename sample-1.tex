@@ -160,7 +160,7 @@
 综上所述，本文的核心贡献在于：
 \begin{itemize}
     \item 提出了一种无中心拜占庭容错多智能体优化框架，并首创了($\beta, \gamma$)-可容许性度量，以严格刻画和约束容错全局目标的凸系数结构。
-    \item 通过证明该优化问题的不可能性定理，确立了任何分布式算法在防范拜占庭攻击时所能达到的理论物理上限。
+    \item 通过证明该优化问题的不可能性定理，确立了任何分布式算法在防范拜占庭攻击时所能达到的理论上限。
     \item 提出了一种基于双重修剪的分布式梯度下降算法，并严格证明了其在完全图网络中能够达到与理论极限相匹配的最优容错性能。
 \end{itemize}
 
@@ -182,7 +182,7 @@
 
 \subsection{局部有界故障模型下的协作分析}
 
-\quad \quad  在探讨故障规模对系统性能的影响时，研究者提出了不同于全局数量限制的故障建模方法。Zhang和Sundaram探讨了信息扩散算法在局部有界故障模型下的鲁棒性~\cite{zhang2011robustness}。在数学表达上，若记正常节点 $i$ 的邻居集合为 $\mathcal{N}_i$，全网拜占庭节点集合为 $\mathcal{A}$，该模型严格约束 $|\mathcal{N}_i \cap \mathcal{A}| \le f$。即假设在任何正常节点的局部邻域内，遭受拜占庭故障的节点数量均不超过预设常数 $f$，而非像传统模型那样仅对全网故障总数施加全局约束（$|\mathcal{A}| \le b$）。这种建模方式能够更准确地刻画超大规模网络中攻击行为的物理分布特性，并据此推导出了实现信息扩散的边界拓扑条件。
+\quad \quad  在探讨故障规模对系统性能的影响时，研究者提出了不同于全局数量限制的故障建模方法。Zhang和Sundaram探讨了信息扩散算法在局部有界故障模型下的鲁棒性~\cite{6315661}。在数学表达上，若记正常节点 $i$ 的邻居集合为 $\mathcal{N}_i$，全网拜占庭节点集合为 $\mathcal{A}$，该模型严格约束 $|\mathcal{N}_i \cap \mathcal{A}| \le f$。即假设在任何正常节点的局部邻域内，遭受拜占庭故障的节点数量均不超过预设常数 $f$，而非像传统模型那样仅对全网故障总数施加全局约束（$|\mathcal{A}| \le b$）。这种建模方式能够更准确地刻画超大规模网络中攻击行为的物理分布特性，并据此推导出了实现信息扩散的边界拓扑条件。
 
 尽管局部故障模型简化了大规模拓扑下攻击的复杂度分析，但在实际的分布式优化应用中，算法通常仍需在更具一般性的全局故障模型下保持稳健。此外，现有关于局部故障模型的研究多侧重于信息的扩散速率与拓扑覆盖范围，尚未充分探讨在数据非独立同分布条件下，如何通过严格的数学约束（例如为正常节点分配非平凡的凸系数权重）来防止全局决策被极端观测值或伪装的对抗数据所劫持。因此，在构建具备结构性保护机制的容错优化框架方面，仍存在显著的理论探索空间。
 
@@ -417,7 +417,7 @@ In: \textit{Proceedings of the 1st International Conference on High Confidence N
 Sundaram S, Hadjicostis C N. Distributed function calculation via linear iterative strategies in the presence of malicious agents[J].
 \textit{IEEE Transactions on Automatic Control}, 2011, 56(7): 1495--1508.
 
-\bibitem{zhang2011robustness}
+\bibitem{6315661}
 Zhang H, Sundaram S. Robustness of information diffusion algorithms to locally bounded adversaries[J].
 \textit{arXiv preprint arXiv:1110.3843}, 2011.
 
